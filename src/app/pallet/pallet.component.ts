@@ -31,7 +31,7 @@ export class PalletComponent implements OnInit, AfterViewInit {
     this.scene.background = new THREE.Color(0x000000);
     this.camera = new THREE.PerspectiveCamera(
       75, this.canvasRef.nativeElement.clientWidth / this.canvasRef.nativeElement.clientHeight, 0.1, 2000);
-    this.camera.position.set(2, 3, 5);
+    this.camera.position.set(2, 1, 1);
     this.camera.lookAt(0, 0, 0);
 
     this.renderer = new THREE.WebGLRenderer({ canvas: this.canvasRef.nativeElement, antialias: true });
@@ -49,14 +49,69 @@ export class PalletComponent implements OnInit, AfterViewInit {
   }
 
   createPallet() {
-    this.palletGroup.clear();
+  this.palletGroup.clear();
 
-    const geometry = new THREE.BoxGeometry( 1, 1, 1 );
-    const textureLoader = new THREE.TextureLoader();
-    const woodTexture = textureLoader.load('assets/wood.jpg');
-    const material = new THREE.MeshStandardMaterial( { map: woodTexture  } );
-    const cube = new THREE.Mesh( geometry, material );
-    this.scene.add( cube );
+  const textureLoader = new THREE.TextureLoader();
+  const woodTexture = textureLoader.load('assets/wood.jpg');
+
+  // Pallet dimensions (in arbitrary units)
+  const plankLength = 2.4;
+  const plankWidth = 0.2;
+  const plankHeight = 0.05;
+  const blockSize = 0.2;
+  const palletHeight = plankHeight * 3 + blockSize;
+
+  // Bottom planks (3)
+  for (let i = -1; i <= 1; i++) {
+    const plank = new THREE.Mesh(
+      new THREE.BoxGeometry(plankLength, plankHeight, plankWidth),
+      new THREE.MeshStandardMaterial({ map: woodTexture })
+    );
+    plank.position.set(0, plankHeight / 2, i * 0.6);
+    plank.castShadow = true;
+    plank.receiveShadow = true;
+    this.palletGroup.add(plank);
+  }
+
+  // Top planks (5)
+  for (let i = -2; i <= 2; i++) {
+    const plank = new THREE.Mesh(
+      new THREE.BoxGeometry(plankLength, plankHeight, plankWidth),
+      new THREE.MeshStandardMaterial({ map: woodTexture })
+    );
+    plank.position.set(0, palletHeight - plankHeight / 2, i * 0.3);
+    plank.castShadow = true;
+    plank.receiveShadow = true;
+    this.palletGroup.add(plank);
+  }
+
+  // Planks below top planks (3)
+  for (let i = -1; i <= 1; i++) {
+    const plankBelow = new THREE.Mesh(
+      new THREE.BoxGeometry(0.2, plankHeight, 1.4),
+      new THREE.MeshStandardMaterial({ map: woodTexture })
+    );
+    plankBelow.position.set(i * 1.1, (plankHeight * 1.5 ) + blockSize, 0);
+    plankBelow.castShadow = true;
+    plankBelow.receiveShadow = true;
+    this.palletGroup.add(plankBelow);
+  }
+
+  // Blocks (9)
+  for (let xi = -1; xi <= 1; xi++) {
+    for (let zi = -1; zi <= 1; zi++) {
+      const block = new THREE.Mesh(
+        new THREE.BoxGeometry(blockSize, blockSize, blockSize),
+        new THREE.MeshStandardMaterial({ map: woodTexture })
+      );
+      block.position.set(xi * (plankLength / 2 - blockSize / 2), plankHeight + blockSize / 2, zi * 0.6);
+      block.castShadow = true;
+      block.receiveShadow = true;
+      this.palletGroup.add(block);
+    }
+  }
+
+  this.scene.add(this.palletGroup);
   }
 
   animate() {
