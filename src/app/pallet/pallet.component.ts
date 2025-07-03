@@ -29,8 +29,9 @@ export class PalletComponent implements OnInit, AfterViewInit {
   initScene() {
     this.scene = new THREE.Scene();
     this.scene.background = new THREE.Color(0x000000);
-    this.camera = new THREE.PerspectiveCamera(75, this.canvasRef.nativeElement.clientWidth / this.canvasRef.nativeElement.clientHeight, 0.1, 1000);
-    this.camera.position.set(1, 1, 2);
+    this.camera = new THREE.PerspectiveCamera(
+      75, this.canvasRef.nativeElement.clientWidth / this.canvasRef.nativeElement.clientHeight, 0.1, 2000);
+    this.camera.position.set(2, 3, 5);
     this.camera.lookAt(0, 0, 0);
 
     this.renderer = new THREE.WebGLRenderer({ canvas: this.canvasRef.nativeElement, antialias: true });
